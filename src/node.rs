@@ -131,3 +131,39 @@ pub struct Plain(pub Vec<Text>);
 pub struct Text {
     pub text: String,
 }
+
+impl From<Text> for Node {
+    fn from(text: Text) -> Self {
+        Node::Inline(Inline::Text(text))
+    }
+}
+
+impl From<Text> for Inline {
+    fn from(text: Text) -> Self {
+        Inline::Text(text)
+    }
+}
+
+impl TryFrom<Node> for Text {
+    type Error = ();
+
+    fn try_from(node: Node) -> Result<Self, Self::Error> {
+        if let Node::Inline(Inline::Text(text)) = node {
+            Ok(text)
+        } else {
+            Err(())
+        }
+    }
+}
+
+impl TryFrom<Inline> for Text {
+    type Error = ();
+
+    fn try_from(inline: Inline) -> Result<Self, Self::Error> {
+        if let Inline::Text(text) = inline {
+            Ok(text)
+        } else {
+            Err(())
+        }
+    }
+}
