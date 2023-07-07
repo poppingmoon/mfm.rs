@@ -144,6 +144,12 @@ impl From<Text> for Inline {
     }
 }
 
+impl From<Text> for Simple {
+    fn from(text: Text) -> Self {
+        Simple::Text(text)
+    }
+}
+
 impl TryFrom<Node> for Text {
     type Error = ();
 
@@ -161,6 +167,18 @@ impl TryFrom<Inline> for Text {
 
     fn try_from(inline: Inline) -> Result<Self, Self::Error> {
         if let Inline::Text(text) = inline {
+            Ok(text)
+        } else {
+            Err(())
+        }
+    }
+}
+
+impl TryFrom<Simple> for Text {
+    type Error = ();
+
+    fn try_from(inline: Simple) -> Result<Self, Self::Error> {
+        if let Simple::Text(text) = inline {
             Ok(text)
         } else {
             Err(())
