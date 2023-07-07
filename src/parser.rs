@@ -88,7 +88,7 @@ impl FullParser {
             map(|s| self.parse_quote(s), Block::Quote),
             map(Self::parse_search, Block::Search),
             map(Self::parse_code_block, Block::CodeBlock),
-            // map(Self::parse_math_block, Block::MathBlock),
+            map(Self::parse_math_block, Block::MathBlock),
         ))(input)
     }
 
@@ -186,7 +186,29 @@ impl FullParser {
     }
 
     fn parse_math_block<'a>(input: &'a str) -> IResult<&'a str, MathBlock> {
-        todo!()
+        const OPEN: &str = r"\[";
+        const CLOSE: &str = r"\]";
+        delimited(
+            opt(line_ending),
+            delimited(
+                tag(OPEN),
+                delimited(
+                    opt(line_ending),
+                    map(
+                        recognize(many1(preceded(
+                            not(pair(opt(line_ending), tag(CLOSE))),
+                            anychar,
+                        ))),
+                        |formula: &str| MathBlock {
+                            formula: formula.to_string(),
+                        },
+                    ),
+                    opt(line_ending),
+                ),
+                line_end(tag(CLOSE)),
+            ),
+            opt(line_ending),
+        )(input)
     }
 
     fn parse_inline<'a>(&self, input: &'a str) -> IResult<&'a str, Inline> {
