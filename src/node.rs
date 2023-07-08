@@ -186,3 +186,9 @@ impl TryFrom<Simple> for Text {
         }
     }
 }
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub enum ValueOrText<T> {
+    Value(T),
+    Text(Text),
+}
