@@ -1039,8 +1039,14 @@ impl FullParser {
     }
 
     fn parse_text<'a>(input: &'a str) -> IResult<&'a str, Text> {
-        map(take(1u8), |s: &str| Text {
-            text: s.to_string(),
-        })(input)
+        map(
+            alt((
+                take_till1(|c: char| !c.is_alphanumeric() || c == 'h'),
+                take(1u8),
+            )),
+            |s: &str| Text {
+                text: s.to_string(),
+            },
+        )(input)
     }
 }
