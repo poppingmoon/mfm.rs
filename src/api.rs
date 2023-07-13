@@ -1,6 +1,7 @@
 use crate::{
     node::{Node, Simple},
     parser::{FullParser, SimpleParser},
+    util::stringify_tree,
 };
 
 /// Generates a MFM Node tree from the MFM string.
@@ -21,4 +22,8 @@ pub fn parse_with_nest_limit(
 /// Generates a MFM Simple Node tree from the MFM string.
 pub fn parse_simple(input: &str) -> Result<Vec<Simple>, nom::Err<nom::error::Error<&str>>> {
     SimpleParser::parse(input).map(|(_, nodes)| nodes)
+}
+
+pub fn to_string(tree: Vec<Node>) -> String {
+    stringify_tree(tree)
 }

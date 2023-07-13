@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::node::{Inline, Node, Simple, Text};
 
 /// Pushes text to vector if stored string is not empty.
@@ -68,4 +70,45 @@ pub fn merge_text_simple(nodes: Vec<Simple>) -> Vec<Simple> {
     );
 
     generate_text(dest, stored_string).0
+}
+
+struct MfmTree(Vec<Node>);
+
+impl From<Vec<Node>> for MfmTree {
+    fn from(nodes: Vec<Node>) -> Self {
+        MfmTree(nodes)
+    }
+}
+
+impl Display for MfmTree {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut nodes = self.0.iter();
+        let mut prev_block = false;
+        if let Some(node) = nodes.next() {
+            if let Node::Block(_) = node {
+                prev_block = true;
+            }
+            write!(f, "{}", node)?;
+        }
+        for node in nodes {
+            match node {
+                Node::Block(_) => {
+                    write!(f, "\n")?;
+                    prev_block = true;
+                }
+                Node::Inline(_) => {
+                    if prev_block {
+                        write!(f, "\n")?;
+                    }
+                    prev_block = false;
+                }
+            }
+            write!(f, "{}", node)?;
+        }
+        Ok(())
+    }
+}
+
+pub fn stringify_tree(nodes: Vec<Node>) -> String {
+    MfmTree::from(nodes).to_string()
 }
